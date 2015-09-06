@@ -9,7 +9,7 @@ use Perl::Critic::Utils qw{ $SEVERITY_MEDIUM :booleans};
 use Carp qw(carp);
 use Data::Dumper;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant supported_parameters => qw(modules debug);
 use constant default_severity     => $SEVERITY_MEDIUM;
@@ -18,8 +18,8 @@ use constant default_themes       => qw(logiclab);
 sub applies_to {
     return (
         qw(
-            PPI::Statement::Include
-            )
+          PPI::Statement::Include
+          )
     );
 }
 
@@ -33,7 +33,8 @@ sub violates {
 
     my @children = $elem->children;
 
-    if ( $children[0]->content eq 'use' or $children[0]->content eq 'require') {
+    if ( $children[0]->content eq 'use' or $children[0]->content eq 'require' )
+    {
 
         my $package = $children[2]->content;
 
@@ -48,28 +49,31 @@ sub violates {
                 if ( defined $self->{_modules}->{$module} ) {
                     my $recommendation = $self->{_modules}->{$module};
                     return $self->violation(
-                        "Blacklisted: $package is not recommended by required standard",
-                        "Use recommended module: $recommendation instead of $package",
+"Blacklisted: $package is not recommended by required standard",
+"Use recommended module: $recommendation instead of $package",
                         $elem,
                     );
 
-                } else {
+                }
+                else {
 
                     return $self->violation(
-                        "Blacklisted: $package is not recommended by required standard",
-                        "Use alternative implementation or module instead of $package",
+"Blacklisted: $package is not recommended by required standard",
+"Use alternative implementation or module instead of $package",
                         $elem,
                     );
                 }
             }
         }
 
-    #we ignore negative use statements, they are for pragma [issue1]
-    } elsif ( $children[0]->content eq 'no' ) {
+        #we ignore negative use statements, they are for pragma [issue1]
+    }
+    elsif ( $children[0]->content eq 'no' ) {
         if ( $self->{debug} ) {
             print STDERR "located 'no' use/require statement\n";
         }
-    } else {
+    }
+    else {
         carp 'Unable to locate package keyword';
     }
 
@@ -111,7 +115,8 @@ sub _parse_modules {
             my @p = split /\s*=>\s*/, $parameter;
 
             $modules{ $p[0] } = $p[1];
-        } else {
+        }
+        else {
             $modules{$parameter} = undef;
         }
     }
@@ -274,6 +279,25 @@ support this coding practice.
 The practice it basically to prohibit problematic components and
 recommend alternatives where possible.
 
+=head1 RECOMMENDATIONS
+
+Here follows some recommendations I have picked up.
+
+=over
+
+=item * L<Error> should be replaced by L<Class::Exception>, by recommendation
+the author
+
+=item * L<IDNA::Punycode> should be replaced by L<Net::IDN::Encode> by recommendation
+the author
+
+=item * <File::Slurp> should be replaced by either <File::Slurper>, <Path::Tiny> or <IO::All>
+Ref: L<http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html>
+
+=item * <File::Stat> should be replaced by <File::stat>
+
+=back
+
 =head1 AUTHOR
 
 =over
@@ -295,9 +319,9 @@ Perl::Critic
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 Jonas B. Nielsen, jonasbn. All rights reserved.
+Copyright (c) 2014-2015 Jonas B. Nielsen, jonasbn. All rights reserved.
 
-Perl::Critic::Policy::logicLAB::ModuleBlacklist;  is released under
+Perl::Critic::Policy::logicLAB::ModuleBlacklist is released under
 the Artistic License 2.0
 
 The distribution is licensed under the Artistic License 2.0, as specified by
